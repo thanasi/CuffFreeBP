@@ -31,7 +31,8 @@ Tidied up inefficiencies since the last version.
 
 
 //  VARIABLES
-int pulsePin = 0;                 // Pulse Sensor purple wire connected to analog pin 0
+int pulsePin  = 0;                // Pulse Sensor purple wire connected to analog pin 0
+int pulsePin2 = 1;                // Pulse Sensor purple wire connected to analog pin 1
 int blinkPin = 13;                // pin to blink led at each beat
 int fadePin = 5;                  // pin to do fancy classy fading blink at each beat
 int fadeRate = 0;                 // used to fade LED on with PWM on fadePin
