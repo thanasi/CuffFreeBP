@@ -2,7 +2,7 @@
 
 
 volatile int rate[2][10];                            // used to hold last ten IBI values
-volatile unsigned long sampleCounter[] = {0,0};         // used to determine pulse timing
+volatile unsigned long sampleCounter = 0;         // used to determine pulse timing
 volatile unsigned long lastBeatTime[] = {0,0};    // used to find the inter beat interval
 volatile int P[] = {512,512};                     // used to find peak in pulse wave
 volatile int T[] = {512,512};                     // used to find trough in pulse wave
@@ -29,8 +29,8 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
 
     // read both sensors first before processing
     // to know we're reading at the same time
-    Signal[0] = analogRead(pulsePin0);          // read the Pulse Sensor 1
-    Signal[1] = analogRead(pulsePin1);          // read the Pulse Sensor 2
+    Signal[0] = analogRead(pulsePin0);          // read the Pulse Sensor 
+    Signal[1] = analogRead(pulsePin1);
     sampleCounter += 2;                         // keep track of the time in mS with this variable
     int N[] = {0,0};
     N[0] = sampleCounter - lastBeatTime[0];     // monitor the time since the last beat to avoid noise
