@@ -47,10 +47,14 @@ int fadeRate1 = 0;                 // used to fade LED on with PWM on fadePin
 
 // these variables are volatile because they are used during the interrupt service routine!
 volatile int BPM [2];                     // used to hold the pulse rate
-volatile int Signal[] = {0,0};            // holds the incoming raw data
-volatile int IBI[] = {600,600};           // holds the time between beats, the Inter-Beat Interval
-volatile boolean Pulse[] = {false,false}; // true when pulse wave is high, false when it's low
-volatile boolean QS[] = {false, false};   // becomes true when Arduino finds a beat.
+volatile int Signal[] = {
+  0,0};            // holds the incoming raw data
+volatile int IBI[] = {
+  600,600};           // holds the time between beats, the Inter-Beat Interval
+volatile boolean Pulse[] = {
+  false,false}; // true when pulse wave is high, false when it's low
+volatile boolean QS[] = {
+  false, false};   // becomes true when Arduino finds a beat.
 
 
 void setup(){
