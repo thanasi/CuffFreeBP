@@ -65,7 +65,7 @@ void loop(){
       sendDataToProcessing('b',BPM[1]);   // send heart rate with a 'B' prefix
       sendDataToProcessing('q',IBI[1]);   // send time between beats with a 'Q' prefix
       QS[1] = false;                      // reset the Quantified Self flag for next time
-  } 
+  }
   delay(20);                             //  take a break
 }
 
