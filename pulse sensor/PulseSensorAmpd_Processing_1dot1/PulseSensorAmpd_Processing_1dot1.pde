@@ -56,11 +56,7 @@ void setup() {
 // GO FIND THE ARDUINO
   println(Serial.list());    // print a list of available serial ports
   // choose the number between the [] that is connected to the Arduino
-<<<<<<< HEAD
-  port = new Serial(this, Serial.list()[10], 115200);  // make sure Arduino is talking serial at this baud rate
-=======
-  port = new Serial(this, Serial.list()[6], 115200);  // make sure Arduino is talking serial at this baud rate
->>>>>>> 2dd97a4a9cb1b486cfd2bd7ede43a0a9bf49fa07
+  port = new Serial(this, Serial.list()[9], 115200);  // make sure Arduino is talking serial at this baud rate
   port.clear();            // flush buffer
   port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
 }
@@ -141,6 +137,3 @@ void draw() {
   
 //   
 }  //end of draw loop
-
-
-

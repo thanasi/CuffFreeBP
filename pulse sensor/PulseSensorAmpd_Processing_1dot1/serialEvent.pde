@@ -3,7 +3,7 @@
 
 
 void serialEvent(Serial port){ 
-   String inData = port.readStringUntil('\n');
+   String inData = new String(port.readBytesUntil('\n'));
    inData = trim(inData);                 // cut off white space (carriage return)
    
    if (inData.charAt(0) == 'S'){          // leading 'S' for sensor data

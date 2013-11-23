@@ -16,6 +16,7 @@ import java.io.IOException;
 
 public class MPSprocessing extends PApplet {
 
+
 /*
 THIS PROGRAM WORKS WITH PulseSensorAmped_Arduino-xx ARDUINO CODE
  THE PULSE DATA WINDOW IS SCALEABLE WITH SCROLLBAR AT BOTTOM OF SCREEN
@@ -81,9 +82,12 @@ public void setup() {
   }
 
   // GO FIND THE ARDUINO
-  println(Serial.list());    // print a list of available serial ports
+  
+  String [] slist = Serial.list();
+  println(slist);    // print a list of available serial ports
+ 
   // choose the number between the [] that is connected to the Arduino
-  port = new Serial(this, Serial.list()[6], 115200);  // make sure Arduino is talking serial at this baud rate
+  port = new Serial(this, Serial.list()[9], 115200);  // make sure Arduino is talking serial at this baud rate
   port.clear();            // flush buffer
   port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
 }
@@ -155,8 +159,8 @@ public void draw() {
     // PRINT THE DATA AND VARIABLE VALUES
     fill(eggshell);                                       // get ready to print text
     text("Pulse Sensor Amped Visualizer 1.1", 245, 30);     // tell them what you are
-    text("IBI " + IBI + "mS", 600, 585);                    // print the time between heartbeats in mS
-    text(BPM + " BPM", 600, 200);                           // print the Beats Per Minute
+    text("IBI " + IBI[0] + "mS", 600, 585);                    // print the time between heartbeats in mS
+    text(BPM[0] + " BPM", 600, 200);                           // print the Beats Per Minute
     text("Pulse Window Scale " + nf(zoom, 1, 2), 150, 585); // show the current scale of Pulse Window
 
     //  DO THE SCROLLBAR THINGS
@@ -165,7 +169,6 @@ public void draw() {
   } // end cycling through both sensors
 
 }  //end of draw loop
-
 
 public void mousePressed() {
   scaleBar.press(mouseX, mouseY);
@@ -279,7 +282,11 @@ class Scrollbar {
 
 
 public void serialEvent(Serial port) { 
-  String inData = port.readStringUntil('\n');
+  // port.bufferUntil('\n');
+  // String inData = port.readString();
+  
+  String inData = new String(port.readBytesUntil('\n'));
+
   inData = trim(inData);                 // cut off white space (carriage return)
 
   // sensor
@@ -290,7 +297,7 @@ public void serialEvent(Serial port) {
   if (inData.charAt(0) == 'B') {          // leading 'B' for BPM data
     inData = inData.substring(1);        // cut off the leading 'B'
     BPM[0] = PApplet.parseInt(inData);                // convert the string to usable int
-    beat[0] = true;                      // set beat flag to advance heart rate graph
+    beat = true;                      // set beat flag to advance heart rate graph
     heart = 20;                          // begin heart image 'swell' timer
   }  
   if (inData.charAt(0) == 'Q') {         // leading 'Q' means IBI data 
@@ -306,7 +313,7 @@ public void serialEvent(Serial port) {
   if (inData.charAt(0) == 'b') {          // leading 'B' for BPM data
     inData = inData.substring(1);        // cut off the leading 'B'
     BPM[1] = PApplet.parseInt(inData);                // convert the string to usable int
-    beat[1] = true;                      // set beat flag to advance heart rate graph
+    beat = true;                      // set beat flag to advance heart rate graph
     heart = 20;                         // begin heart image 'swell' timer
   }
   if (inData.charAt(0) == 'q') {           // leading 'Q' means IBI data 
@@ -314,7 +321,6 @@ public void serialEvent(Serial port) {
     IBI[1] = PApplet.parseInt(inData);                // convert the string to usable int
   }
 }
-
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "MPSprocessing" };
     if (passedArgs != null) {

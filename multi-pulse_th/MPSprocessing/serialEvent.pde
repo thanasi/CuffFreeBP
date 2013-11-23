@@ -1,8 +1,10 @@
 
 void serialEvent(Serial port) { 
-  port.bufferUntil('\n');
-  String inData = port.readString();
+  // port.bufferUntil('\n');
+  // String inData = port.readString();
   
+  String inData = new String(port.readBytesUntil('\n'));
+
   inData = trim(inData);                 // cut off white space (carriage return)
 
   // sensor
