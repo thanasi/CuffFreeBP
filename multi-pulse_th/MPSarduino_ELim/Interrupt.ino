@@ -1,15 +1,15 @@
 
 
-
-volatile int rate[2][10];                            // used to hold last ten IBI values
-volatile unsigned long sampleCounter = 0;         // used to determine pulse timing
-volatile unsigned long lastBeatTime[] = {0,0};    // used to find the inter beat interval
-volatile int P[] = {512,512};                     // used to find peak in pulse wave
-volatile int T[] = {512,512};                     // used to find trough in pulse wave
-volatile int thresh[] = {512, 512};               // used to find instant moment of heart beat
-volatile int amp[] = {100,100};                   // used to hold amplitude of pulse waveform
-volatile boolean firstBeat[] = {true,true};       // used to seed rate array so we startup with reasonable BPM
-volatile boolean secondBeat[] = {true,true};      // used to seed rate array so we startup with reasonable BPM
+volatile int rate0[10];                            // used to hold last ten IBI values
+volatile int rate1[10];                            // used to hold last ten IBI values
+volatile unsigned long sampleCounter[2] = {0,0};         // used to determine pulse timing
+volatile unsigned long lastBeatTime[2] = {0,0};    // used to find the inter beat interval
+volatile int P[2] = {512,512};                     // used to find peak in pulse wave
+volatile int T[2] = {512,512};                     // used to find trough in pulse wave
+volatile int thresh[2] = {512,512};               // used to find instant moment of heart beat
+volatile int amp[2] = {100,100};                   // used to hold amplitude of pulse waveform
+volatile boolean firstBeat[2] = {true,true};       // used to seed rate array so we startup with reasonable BPM
+volatile boolean secondBeat[2] = {true,true};      // used to seed rate array so we startup with reasonable BPM
 
 
 void interruptSetup(){     
@@ -26,25 +26,22 @@ void interruptSetup(){
 // Timer 2 makes sure that we take a reading every 2 miliseconds
 ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts to 124
     cli();                                      // disable interrupts while we do this
-
     // read both sensors first before processing
     // to know we're reading at the same time
     Signal[0] = analogRead(pulsePin0);          // read the Pulse Sensor 
     Signal[1] = analogRead(pulsePin1);
-    sampleCounter += 2;                         // keep track of the time in mS with this variable
-    int N[] = {0,0};
-    N[0] = sampleCounter - lastBeatTime[0];     // monitor the time since the last beat to avoid noise
-    N[1] = sampleCounter - lastBeatTime[1];
+    sampleCounter[0] += 2;                         // keep track of the time in mS with this variable
+    sampleCounter[1] += 2;
+    int N[0] = sampleCounter[0] - lastBeatTime[0];     // monitor the time since the last beat to avoid noise
+    int N[1] = sampleCounter[1] - lastBeatTime[1];
 
+  for (int i=0;i<2;i++) {
     // find the peak and trough of the pulse waves
-    // cycle through the two sensors
-    for (int i = 0; i<2; i++) {
-
       if(Signal[i] < thresh[i] && N[i] > (IBI[i]/5)*3){       // avoid dichrotic noise by waiting 3/5 of last IBI
           if (Signal[i] < T[i]){                        // T is the trough
               T[i] = Signal[i];                         // keep track of lowest point in pulse wave 
           }
-      }
+      }     
         
       if(Signal[i] > thresh[i] && Signal[i] > P[i]){ // thresh condition helps avoid noise
           P[i] = Signal[i];                          // P is the peak
@@ -55,33 +52,38 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
     if (N[i] > 250){                                   // avoid high frequency noise
       if ( (Signal[i] > thresh[i]) && (Pulse[i] == false) && (N[i] > (IBI[i]/5)*3) ){        
         Pulse[i] = true;                               // set the Pulse flag when we think there is a pulse
-        digitalWrite(blinkPin[i],HIGH);                // turn on pin 13 LED
-        IBI[i] = sampleCounter - lastBeatTime[i];      // measure time between beats in mS
-        lastBeatTime[i] = sampleCounter;               // keep track of time for next pulse
+        IBI[i] = sampleCounter[i] - lastBeatTime[i];      // measure time between beats in mS
+        lastBeatTime[i] = sampleCounter[i];               // keep track of time for next pulse
              
              if(firstBeat[i]){                         // if it's the first time we found a beat, if firstBeat == TRUE
                  firstBeat[i] = false;                 // clear firstBeat flag
                  continue;                             // IBI value is unreliable so move on
-                }   
+             }   
 
              if(secondBeat[i]){                        // if this is the second beat, if secondBeat == TRUE
                 secondBeat[i] = false;                 // clear secondBeat flag
                    for(int j=0; j<=9; j++){         // seed the running total to get a realistic BPM at startup
                         rate[j][j] = IBI[i];                      
                         }
-                }
+             }
               
         // keep a running total of the last 10 IBI values
-        word runningTotal = 0;                   // clear the runningTotal variable    
+        word runningTotal0 = 0;                   // clear the runningTotal variable    
+        word runningTotal1 = 0;
 
         for(int j=0; j<=8; j++){                // shift data in the rate array
-              rate[i][j] = rate[i][j+1];              // and drop the oldest IBI value 
-              runningTotal += rate[i][j];          // add up the 9 oldest IBI values
-            }
+              rate0[j] = rate0[i][j+1];              // and drop the oldest IBI value 
+              rate1[j] = rate1[i][j+1];
+              runningTotal0 += rate0[i][j];          // add up the 9 oldest IBI values
+              runningTotal1 += rate1[i][j];
+        }
             
-        rate[i][9] = IBI[i];                          // add the latest IBI to the rate array
-        runningTotal += rate[i][9];                // add the latest IBI to runningTotal
-        runningTotal /= 10;                     // average the last 10 IBI values 
+        rate0[9] = IBI[i];                          // add the latest IBI to the rate array
+        rate1[9] = IBI[i];
+        runningTotal0 += rate[i][9];                // add the latest IBI to runningTotal
+        runningTotal1 += rate[i][9];
+        runningTotal0 /= 10;                     // average the last 10 IBI values 
+        runningTotal1 /= 10;
         BPM[i] = 60000/runningTotal;               // how many beats can fit into a minute? that's BPM!
         QS[i] = true;                              // set Quantified Self flag 
         // QS FLAG IS NOT CLEARED INSIDE THIS ISR
@@ -96,7 +98,7 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
         thresh[i] = amp[i]/2 + T[i];                    // set thresh at 50% of the amplitude
         P[i] = thresh[i];                            // reset these for next time
         T[i] = thresh[i];
-       } // end cyclic reset
+    } // end cyclic reset
     
     // reset if no response
     if (N[i] > 2500){                             // if 2.5 seconds go by without a beat
@@ -106,9 +108,8 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
         lastBeatTime[i] = sampleCounter;          // bring the lastBeatTime up to date        
         firstBeat[i] = true;                      // set these to avoid noise
         secondBeat[i] = true;                     // when we get the heartbeat back
-       } // end no response reset
-  } // end looping through two sensors
-
+    } // end no response reset
+  }
   sei();                                     // enable interrupts when youre done!
 }// end isr
 
