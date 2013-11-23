@@ -7,6 +7,7 @@ MADE BY JOEL MURPHY AUGUST, 2012
 
 
 import processing.serial.*;
+import java.util.Arrays;
 PFont font;
 Scrollbar scaleBar;
 
@@ -54,9 +55,21 @@ void setup() {
  }
    
 // GO FIND THE ARDUINO
-  println(Serial.list());    // print a list of available serial ports
+  println(Arrays.toString(Serial.list()).replace(' ','\n'));    // print a list of available serial ports
   // choose the number between the [] that is connected to the Arduino
+<<<<<<< HEAD
   port = new Serial(this, Serial.list()[7], 115200);  // make sure Arduino is talking serial at this baud rate
+=======
+<<<<<<< HEAD
+  port = new Serial(this, Serial.list()[4], 115200);  // make sure Arduino is talking serial at this baud rate
+=======
+<<<<<<< HEAD
+  port = new Serial(this, Serial.list()[10], 115200);  // make sure Arduino is talking serial at this baud rate
+=======
+  port = new Serial(this, Serial.list()[6], 115200);  // make sure Arduino is talking serial at this baud rate
+>>>>>>> 2dd97a4a9cb1b486cfd2bd7ede43a0a9bf49fa07
+>>>>>>> 64f8f34be700228955c97249b8fe1889ac0606e3
+>>>>>>> 6432ac71984b1172b169d41208d73ffd2093c51f
   port.clear();            // flush buffer
   port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
 }
