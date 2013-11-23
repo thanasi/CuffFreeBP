@@ -83,7 +83,7 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
         // calculate the time difference between the two pulses
         if (i==1) {
           DF = true;
-          D = Math.abs(lastBeatTime[0] - lastBeatTime[1]);
+          DIFF = (lastBeatTime[0] - lastBeatTime[1]);
         }
 
 
