@@ -69,7 +69,7 @@ void setup() {
   println(slist);    // print a list of available serial ports
  
   // choose the number between the [] that is connected to the Arduino
-  port = new Serial(this, Serial.list()[9], 115200);  // make sure Arduino is talking serial at this baud rate
+  port = new Serial(this, Serial.list()[7], 115200);  // make sure Arduino is talking serial at this baud rate
   port.clear();            // flush buffer
   port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
 }
@@ -90,10 +90,10 @@ void draw() {
     offset = map(zoom, 0.5, 1, 150, 0);                // calculate the offset needed at this scale
     for (int i = 0; i < RawY[j].length-1; i++) {      // move the pulse waveform by
       RawY[j][i] = RawY[j][i+1];                         // shifting all raw datapoints one pixel left
-      float dummy = RawY[j][i] * zoom + offset;       // adjust the raw data to the selected scale
+      float dummy = RawY[j][i] * zoom + offset + (float) Math.pow(-1,j) * 50;       // adjust the raw data to the selected scale
       ScaledY[j][i] = constrain(int(dummy), 44, 556);   // transfer the raw data array to the scaled array
     }
-    stroke(250, 0, 0);                               // red is a good color for the pulse waveform
+    stroke(250-j*127,j*127, 0);                               // red is a good color for the pulse waveform
     noFill();
     beginShape();                                  // using beginShape() renders fast
     for (int x = 1; x < ScaledY[j].length-1; x++) {    
