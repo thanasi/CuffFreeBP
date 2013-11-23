@@ -36,6 +36,16 @@
 
 //  VARIABLES
 int pulsePin0 = 0;                 // Pulse Sensor purple wire connected to analog pin 0
+<<<<<<< HEAD
+int pulsePin1 = 1;                 // Pulse Sensor purple wire connected to analog pin 1
+
+// these variables are volatile because they are used during the interrupt service routine!
+volatile int BPM [2][];                     // used to hold the pulse rate
+volatile int Signal[] = {0,0};            // holds the incoming raw data
+volatile int IBI[] = {600,600};           // holds the time between beats, the Inter-Beat Interval
+volatile boolean Pulse[] = {false,false}; // true when pulse wave is high, false when it's low
+volatile boolean QS[] = {false, false};   // becomes true when Arduino finds a beat.
+=======
 int pulsePin1 = 1;
 int blinkPin[] = {
   13,14};                // pin to blink led at each beat
@@ -47,18 +57,25 @@ int fadeRate1 = 0;                 // used to fade LED on with PWM on fadePin
 
 // these variables are volatile because they are used during the interrupt service routine!
 volatile int BPM [2];                     // used to hold the pulse rate
+<<<<<<< HEAD
 volatile int Signal[] = {0,0};            // holds the incoming raw data
 volatile int IBI[] = {600,600};           // holds the time between beats, the Inter-Beat Interval
 volatile boolean Pulse[] = {false,false}; // true when pulse wave is high, false when it's low
 volatile boolean QS[] = {false, false};   // becomes true when Arduino finds a beat.
+=======
+volatile int Signal[] = {
+  0,0};            // holds the incoming raw data
+volatile int IBI[] = {
+  600,600};           // holds the time between beats, the Inter-Beat Interval
+volatile boolean Pulse[] = {
+  false,false}; // true when pulse wave is high, false when it's low
+volatile boolean QS[] = {
+  false, false};   // becomes true when Arduino finds a beat.
+>>>>>>> fe45cc5a2e56e45c5ece9848b55ec9f808c73492
+>>>>>>> 64f8f34be700228955c97249b8fe1889ac0606e3
 
 
 void setup(){
-  for (int i=0;i<2;i++) {
-    pinMode(blinkPin[i],OUTPUT);         // pin that will blink to your heartbeat!
-    pinMode(fadePin[i],OUTPUT);          // pin that will fade to your heartbeat!
-  }
-
   Serial.begin(115200);             // we agree to talk fast!
   interruptSetup();                 // sets up to read Pulse Sensor signal(s) every 2mS 
   // UN-COMMENT THE NEXT LINE IF YOU ARE POWERING The Pulse Sensor AT LOW VOLTAGE, 
@@ -71,6 +88,18 @@ void loop(){
   sendDataToProcessing('S', Signal[0]);     // send Processing the raw Pulse Sensor data
   sendDataToProcessing('s', Signal[1]);     // second sensor datapoint prefixed by lower case letters
   if (QS[0] == true){                       // Quantified Self flag is true when arduino finds a heartbeat
+<<<<<<< HEAD
+        sendDataToProcessing('B',BPM[0]);   // send heart rate with a 'B' prefix
+        sendDataToProcessing('Q',IBI[0]);   // send time between beats with a 'Q' prefix
+        QS[0] = false;                      // reset the Quantified Self flag for next time
+  }
+  if (QS[1] == true){                       // Quantified Self flag is true when arduino finds a heartbeat
+      sendDataToProcessing('b',BPM[1]);   // send heart rate with a 'B' prefix
+      sendDataToProcessing('q',IBI[1]);   // send time between beats with a 'Q' prefix
+      QS[1] = false;                      // reset the Quantified Self flag for next time
+}
+  
+=======
     fadeRate0 = 255;                    // Set 'fadeRate' Variable to 255 to fade LED with pulse
     sendDataToProcessing('B',BPM[0]);   // send heart rate with a 'B' prefix
     sendDataToProcessing('Q',IBI[0]);   // send time between beats with a 'Q' prefix
@@ -86,10 +115,13 @@ void loop(){
 
   ledFadeToBeat();
 
+>>>>>>> fe45cc5a2e56e45c5ece9848b55ec9f808c73492
   delay(20);                             //  take a break
 }
 
 
+<<<<<<< HEAD
+=======
 void ledFadeToBeat(){
   fadeRate0 -= 15;                         //  set LED fade value
   fadeRate1 -= 15;
@@ -100,6 +132,7 @@ void ledFadeToBeat(){
 }
 
 
+>>>>>>> fe45cc5a2e56e45c5ece9848b55ec9f808c73492
 void sendDataToProcessing(char symbol, int data ){
   Serial.print(symbol);                // symbol prefix tells Processing what type of data is coming
   Serial.println(data);                // the data to send culminating in a carriage return

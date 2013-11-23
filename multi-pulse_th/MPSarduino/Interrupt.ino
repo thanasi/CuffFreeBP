@@ -2,6 +2,16 @@
 
 
 volatile int rate[2][10];                            // used to hold last ten IBI values
+<<<<<<< HEAD
+volatile unsigned long sampleCounter[] = {0,0};         // used to determine pulse timing
+volatile unsigned long lastBeatTime[] = {0,0};    // used to find the inter beat interval
+volatile int P[] = {512,512};                     // used to find peak in pulse wave
+volatile int T[] = {512,512};                     // used to find trough in pulse wave
+volatile int thresh[] = {512, 512};               // used to find instant moment of heart beat
+volatile int amp[] = {100,100};                   // used to hold amplitude of pulse waveform
+volatile boolean firstBeat[] = {true,true};       // used to seed rate array so we startup with reasonable BPM
+volatile boolean secondBeat[] = {true,true};      // used to seed rate array so we startup with reasonable BPM
+=======
 volatile unsigned long sampleCounter = 0;         // used to determine pulse timing
 volatile unsigned long lastBeatTime[] = {
   0,0};    // used to find the inter beat interval
@@ -17,6 +27,7 @@ volatile boolean firstBeat[] = {
   true,true};       // used to seed rate array so we startup with reasonable BPM
 volatile boolean secondBeat[] = {
   true,true};      // used to seed rate array so we startup with reasonable BPM
+>>>>>>> fe45cc5a2e56e45c5ece9848b55ec9f808c73492
 
 
 void interruptSetup(){     
@@ -32,6 +43,27 @@ void interruptSetup(){
 // THIS IS THE TIMER 2 INTERRUPT SERVICE ROUTINE. 
 // Timer 2 makes sure that we take a reading every 2 miliseconds
 ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts to 124
+<<<<<<< HEAD
+    cli();                                      // disable interrupts while we do this
+
+    // read both sensors first before processing
+    // to know we're reading at the same time
+    Signal[0] = analogRead(pulsePin0);          // read the Pulse Sensor 1
+    Signal[1] = analogRead(pulsePin1);          // read the Pulse Sensor 2
+    sampleCounter += 2;                         // keep track of the time in mS with this variable
+    int N[] = {0,0};
+    N[0] = sampleCounter - lastBeatTime[0];     // monitor the time since the last beat to avoid noise
+    N[1] = sampleCounter - lastBeatTime[1];
+
+    // find the peak and trough of the pulse waves
+    // cycle through the two sensors
+    for (int i = 0; i<2; i++) {
+
+      if(Signal[i] < thresh[i] && N[i] > (IBI[i]/5)*3){       // avoid dichrotic noise by waiting 3/5 of last IBI
+          if (Signal[i] < T[i]){                        // T is the trough
+              T[i] = Signal[i];                         // keep track of lowest point in pulse wave 
+          }
+=======
   cli();                                      // disable interrupts while we do this
 
   // read both sensors first before processing
@@ -51,6 +83,7 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
     if(Signal[i] < thresh[i] && N[i] > (IBI[i]/5)*3){       // avoid dichrotic noise by waiting 3/5 of last IBI
       if (Signal[i] < T[i]){                        // T is the trough
         T[i] = Signal[i];                         // keep track of lowest point in pulse wave 
+>>>>>>> fe45cc5a2e56e45c5ece9848b55ec9f808c73492
       }
     }
 
