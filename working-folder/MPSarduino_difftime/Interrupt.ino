@@ -15,7 +15,7 @@ volatile word  runningTotal[2]= {0,0};
 void interruptSetup(){     
   // Initializes Timer2 to throw an interrupt every 2mS.
   TCCR2A = 0x02;     // DISABLE PWM ON DIGITAL PINS 3 AND 11, AND GO INTO CTC MODE
-  TCCR2B = 0x05;     // DON'T FORCE COMPARE, 256 PRESCALER 
+  TCCR2B = 0x06;     // DON'T FORCE COMPARE, 256 PRESCALER 
   OCR2A = 0X7C;      // SET THE TOP OF THE COUNT TO 124 FOR 500Hz SAMPLE RATE
   TIMSK2 = 0x02;     // ENABLE INTERRUPT ON MATCH BETWEEN TIMER2 AND OCR2A
   sei();             // MAKE SURE GLOBAL INTERRUPTS ARE ENABLED      
@@ -32,7 +32,7 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
     Signal[1] = analogRead(pulsePin1);
     
   for (int i=0;i<2;i++) {
-    sampleCounter[i] += 1;                         // keep track of the time in mS with this variable
+    sampleCounter[i] += 2;                         // keep track of the time in mS with this variable
     N[i] = sampleCounter[i] - lastBeatTime[i];     // monitor the time since the last beat to avoid noise
     // find the peak and trough of the pulse waves
       if(Signal[i] < thresh[i] && N[i] > (IBI[i]/5)*3){       // avoid dichrotic noise by waiting 3/5 of last IBI
